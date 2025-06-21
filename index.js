@@ -1,38 +1,56 @@
-// const kitu = require("./second")
-// const myosFile = require('./OS')
-
-// console.log("hello world! ", kitu );
-// // console.log(myosFile.freeMemory)
-// console.log(myosFile.homeDirectory);
-// console.log(myosFile.hostName);
-// console.log(myosFile.platformName);
-// console.log(myosFile.osName);
-
 const express = require('express')
 const app = express()
 
 app.listen(5125)
 
-app.use((req, res, next) =>{
-    console.log('middleware start');
-    next()
-    console.log('middleware end');
+// middleware
+// app.use((req, res, next) =>{
+//     console.log('middleware start');
+//     next() 
+// })
+
+app.get('/', (req, res) => {
+    res.send('Connected')
+    console.log('✅ Connection Succesful')
+})
+
+const userModel = require('./db/models/userModel.js')
+
+// to create a user in db
+app.get('/adduser', async (req, res) => {
+    const createdUser = await userModel.create({
+        name: "Ankit",
+        username: "kitu",
+        email: "savaliyaankit5125@gmail.com",
+        password: "000000",
+        m_no: 1234567890
+    })
+
+    console.log('USER ADDED : ✅');
     
+    res.json(createdUser)
 })
 
-app.get('/greet/:name', (req, res) => {
-    res.send(`Hello ${req.params.name }`)
+// to update a user in db
+app.get('/updateuser', async (req, res) => {
+    const updatedUser = await userModel.findOneAndUpdate( {name : "Ankit"}, {name  : "Dhruv"},{new : true} )
+
+    console.log('USER UPDATED : ✅');
+    res.json(updatedUser)
 })
 
-app.get('/sum/:num1/:num2' , (req, res) => {
-    var num1 = req.params.num1;
-    var num2 = req.params.num2;
-    var sum = Number.parseInt(num1) + Number.parseInt(num2);
-    
-    res.send(`${num1} + ${num2} = ${sum}`)
+// to read all the users in db
+app.get('/getusers' , async (req, res) =>{
+    const users = await userModel.find({ password : "000000"})
+
+    console.log('USERS READ : ✅');
+    res.json(users)
 })
 
-app.get('/', (req,res) => {
-    console.log('get');
-    res.send("<b>good</b>")
+// to read a single users in db
+app.get('/getuser' , async (req, res) =>{
+    const users = await userModel.findOne({ password : "000000"})
+
+    console.log('USER READ : ✅');
+    res.json(users)
 })
